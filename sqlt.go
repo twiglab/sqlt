@@ -1,4 +1,4 @@
-package xsqlt
+package sqlt
 
 import (
 	"context"

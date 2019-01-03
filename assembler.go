@@ -1,4 +1,4 @@
-package xsqlt
+package sqlt
 
 import (
 	"io"
@@ -19,7 +19,7 @@ func NewStdTemplateRenderDefault(pattern string) *StdTemplateRender {
 }
 
 func NewStdTemplateRender(pattern string, funcMap template.FuncMap) *StdTemplateRender {
-	tpl := template.New("nsqlt-template").Funcs(funcMap)
+	tpl := template.New("sqlt-template").Funcs(funcMap)
 	tpl = template.Must(tpl.ParseGlob(pattern))
 	return &StdTemplateRender{pattern: pattern, funcMap: funcMap, t: tpl}
 }
