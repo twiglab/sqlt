@@ -77,18 +77,6 @@ func (c *Dbop) ExecRtnContext(ctx context.Context, id string, data interface{}, 
 	return c.QueryContext(ctx, id, data, mrh)
 }
 
-func (c *Dbop) Query(id string, data interface{}, mrh Handler) error {
-	return c.QueryContext(context.Background(), id, data, mrh)
-}
-
-func (c *Dbop) Exec(id string, data interface{}) (sql.Result, error) {
-	return c.ExecContext(context.Background(), id, data)
-}
-
-func (c *Dbop) ExecRtn(id string, data interface{}, mrh Handler) error {
-	return c.ExecRtnContext(context.Background(), id, data, mrh)
-}
-
 func (c *Dbop) BeginTrans(ctx context.Context, opt *sql.TxOptions) (*Txop, error) {
 	tx, err := c.BeginTxx(ctx, opt)
 	if err != nil {
@@ -106,35 +94,23 @@ type Txop struct {
 	*sqlx.Tx
 }
 
-func (c *Txop) QueryContext(ctx context.Context, id string, data interface{}, h Handler) error {
-	return query(ctx, c, id, data, h)
+func (t *Txop) QueryContext(ctx context.Context, id string, data interface{}, h Handler) error {
+	return query(ctx, t, id, data, h)
 }
 
-func (c *Txop) ExecContext(ctx context.Context, id string, data interface{}) (r sql.Result, e error) {
-	r, e = exec(ctx, c, id, data)
+func (t *Txop) ExecContext(ctx context.Context, id string, data interface{}) (r sql.Result, e error) {
+	r, e = exec(ctx, t, id, data)
 	return
 }
 
-func (c *Txop) ExecRtnContext(ctx context.Context, id string, data interface{}, mrh Handler) error {
-	return c.QueryContext(ctx, id, data, mrh)
+func (t *Txop) ExecRtnContext(ctx context.Context, id string, data interface{}, h Handler) error {
+	return t.QueryContext(ctx, id, data, h)
 }
 
-func (c *Txop) Query(id string, data interface{}, mrh Handler) error {
-	return c.QueryContext(context.Background(), id, data, mrh)
+func (t *Txop) CommitTrans() error {
+	return t.Commit()
 }
 
-func (c *Txop) Exec(id string, data interface{}) (sql.Result, error) {
-	return c.ExecContext(context.Background(), id, data)
-}
-
-func (c *Txop) ExecRtn(id string, data interface{}, mrh Handler) error {
-	return c.ExecRtnContext(context.Background(), id, data, mrh)
-}
-
-func (c *Txop) CommitTrans() error {
-	return c.Commit()
-}
-
-func (c *Txop) RollbackTrans() error {
-	return c.Rollback()
+func (t *Txop) RollbackTrans() error {
+	return t.Rollback()
 }
