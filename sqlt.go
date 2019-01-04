@@ -58,8 +58,13 @@ type (
 )
 
 func New(driverName, dataSourceName, pattern string) *Dbop {
+	db := sqlx.MustConnect(driverName, dataSourceName)
+	return NewWithDB(db, pattern)
+}
+
+func NewWithDB(db *sqlx.DB, pattern string) *Dbop {
 	return &Dbop{
-		DB:              sqlx.MustConnect(driverName, dataSourceName),
+		DB:              db,
 		StdSqlAssembler: NewStdSqlAssemblerDefault(pattern),
 	}
 }
