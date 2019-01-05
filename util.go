@@ -13,19 +13,30 @@ func NewTxOptions(level sql.IsolationLevel, readonly bool) *sql.TxOptions {
 	return &sql.TxOptions{Isolation: level, ReadOnly: readonly}
 }
 
+var null = make(map[string]interface{})
+
+func dummy(p interface{}) interface{} {
+	if p == nil {
+		return null
+	}
+	return p
+}
+
 type sqltExecer interface {
 	PrepareNamedContext(context.Context, string) (*sqlx.NamedStmt, error)
 	Maker
 }
 
 func query(ctx context.Context, ext sqltExecer, id string, data interface{}, h ExtractFunc) error {
-	sql := MustSql(ext, id, data)
+	param := dummy(data)
+
+	sql := MustSql(ext, id, param)
 	stmt, err := ext.PrepareNamedContext(ctx, sql)
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
-	rows, err := stmt.QueryxContext(ctx, data)
+	rows, err := stmt.QueryxContext(ctx, param)
 	if err != nil {
 		return err
 	}
@@ -34,13 +45,15 @@ func query(ctx context.Context, ext sqltExecer, id string, data interface{}, h E
 }
 
 func exec(ctx context.Context, ext sqltExecer, id string, data interface{}) (r sql.Result, e error) {
-	sql := MustSql(ext, id, data)
+	param := dummy(data)
+
+	sql := MustSql(ext, id, param)
 	stmt, err := ext.PrepareNamedContext(ctx, sql)
 	if err != nil {
 		return nil, err
 	}
 	defer stmt.Close()
-	r, e = stmt.ExecContext(ctx, data)
+	r, e = stmt.ExecContext(ctx, param)
 	return
 }
 
@@ -55,14 +68,34 @@ func Query(execer TExecer, ctx context.Context, id string, param interface{}, h 
 	return
 }
 
+func MustQuery(execer TExecer, ctx context.Context, id string, param interface{}, h ExtractFunc) {
+	if err := Query(execer, ctx, id, param, h); err != nil {
+		panic(err)
+	}
+}
+
 func Exec(execer TExecer, ctx context.Context, id string, param interface{}) (r sql.Result, err error) {
 	r, err = execer.TExec(ctx, id, param)
+	return
+}
+
+func MustExec(execer TExecer, ctx context.Context, id string, param interface{}) (r sql.Result) {
+	var err error
+	if r, err = Exec(execer, ctx, id, param); err != nil {
+		panic(err)
+	}
 	return
 }
 
 func ExecRtn(execer TExecer, ctx context.Context, id string, param interface{}, h ExtractFunc) (err error) {
 	err = execer.TExecRtn(ctx, id, param, h)
 	return
+}
+
+func MustExecRtn(execer TExecer, ctx context.Context, id string, param interface{}, h ExtractFunc) {
+	if err := ExecRtn(execer, ctx, id, param, h); err != nil {
+		panic(err)
+	}
 }
 
 type TxBegin interface {
