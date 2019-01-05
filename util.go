@@ -7,12 +7,18 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type sqlExecer interface {
+var DefaultTxOptions *sql.TxOptions = NewTxOptions(sql.LevelDefault, false)
+
+func NewTxOptions(level sql.IsolationLevel, readonly bool) *sql.TxOptions {
+	return &sql.TxOptions{Isolation: level, ReadOnly: readonly}
+}
+
+type sqltExecer interface {
 	PrepareNamedContext(context.Context, string) (*sqlx.NamedStmt, error)
 	Maker
 }
 
-func query(ctx context.Context, ext sqlExecer, id string, data interface{}, h Handler) error {
+func query(ctx context.Context, ext sqltExecer, id string, data interface{}, h ExtractFunc) error {
 	sql := MustSql(ext, id, data)
 	stmt, err := ext.PrepareNamedContext(ctx, sql)
 	if err != nil {
@@ -24,10 +30,10 @@ func query(ctx context.Context, ext sqlExecer, id string, data interface{}, h Ha
 		return err
 	}
 	defer rows.Close()
-	return h.HandleRows(rows)
+	return h(rows)
 }
 
-func exec(ctx context.Context, ext sqlExecer, id string, data interface{}) (r sql.Result, e error) {
+func exec(ctx context.Context, ext sqltExecer, id string, data interface{}) (r sql.Result, e error) {
 	sql := MustSql(ext, id, data)
 	stmt, err := ext.PrepareNamedContext(ctx, sql)
 	if err != nil {
@@ -38,38 +44,44 @@ func exec(ctx context.Context, ext sqlExecer, id string, data interface{}) (r sq
 	return
 }
 
-type Execer interface {
-	Exec(context.Context, string, interface{}) (sql.Result, error)
-	ExecRtn(context.Context, string, interface{}, Handler) error
+type TExecer interface {
+	TQuery(context.Context, string, interface{}, ExtractFunc) error
+	TExec(context.Context, string, interface{}) (sql.Result, error)
+	TExecRtn(context.Context, string, interface{}, ExtractFunc) error
 }
 
-func Exec(execer Execer, ctx context.Context, id string, param interface{}) (r sql.Result, err error) {
-	r, err = execer.Exec(ctx, id, param)
+func Query(execer TExecer, ctx context.Context, id string, param interface{}, h ExtractFunc) (err error) {
+	err = execer.TExecRtn(ctx, id, param, h)
 	return
 }
 
-func ExecRtn(execer Execer, ctx context.Context, id string, param interface{}, h Handler) (err error) {
-	err = execer.ExecRtn(ctx, id, param, h)
+func Exec(execer TExecer, ctx context.Context, id string, param interface{}) (r sql.Result, err error) {
+	r, err = execer.TExec(ctx, id, param)
+	return
+}
+
+func ExecRtn(execer TExecer, ctx context.Context, id string, param interface{}, h ExtractFunc) (err error) {
+	err = execer.TExecRtn(ctx, id, param, h)
 	return
 }
 
 type TxBegin interface {
-	BeginTrans(context.Context, *sql.TxOptions) (*Txop, error)
+	TBegin(context.Context, *sql.TxOptions) (*Txop, error)
 }
 
 func Begin(b TxBegin, ctx context.Context, opt *sql.TxOptions) (*Txop, error) {
-	return b.BeginTrans(ctx, opt)
+	return b.TBegin(ctx, opt)
 }
 
 type TxEnd interface {
-	CommitTrans() error
-	Rollback() error
+	TCommit() error
+	TRollback() error
 }
 
 func Commit(t TxEnd) error {
-	return t.CommitTrans()
+	return t.TCommit()
 }
 
 func Rollback(t TxEnd) error {
-	return t.CommitTrans()
+	return t.TRollback()
 }
