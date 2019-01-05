@@ -13,7 +13,9 @@ func NewTxOptions(level sql.IsolationLevel, readonly bool) *sql.TxOptions {
 	return &sql.TxOptions{Isolation: level, ReadOnly: readonly}
 }
 
-var null = make(map[string]interface{})
+type Param = map[string]interface{}
+
+var null = make(Param)
 
 func dummy(p interface{}) interface{} {
 	if p == nil {
