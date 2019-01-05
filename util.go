@@ -51,7 +51,7 @@ type TExecer interface {
 }
 
 func Query(execer TExecer, ctx context.Context, id string, param interface{}, h ExtractFunc) (err error) {
-	err = execer.TExecRtn(ctx, id, param, h)
+	err = execer.TQuery(ctx, id, param, h)
 	return
 }
 
