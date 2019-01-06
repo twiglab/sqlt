@@ -10,7 +10,7 @@ import (
 type SqlTemplate struct {
 	*template.Template
 	Debug  bool
-	logger *log.Logger
+	Logger *log.Logger
 }
 
 func NewSqlTemplate(pattern string) *SqlTemplate {
@@ -19,7 +19,7 @@ func NewSqlTemplate(pattern string) *SqlTemplate {
 	return &SqlTemplate{
 		Template: tpl,
 		Debug:    false,
-		logger:   log.New(os.Stdout, "sqlt-std-template-", log.LstdFlags|log.Llongfile),
+		Logger:   log.New(os.Stdout, "sqlt-std-maker-", log.LstdFlags|log.Lshortfile),
 	}
 }
 
@@ -28,7 +28,7 @@ func (t *SqlTemplate) MakeSql(id string, param interface{}) (string, error) {
 	err := t.ExecuteTemplate(sb, id, param)
 
 	if t.Debug && err == nil {
-		t.logger.Println(sb)
+		t.Logger.Println(sb)
 	}
 
 	return sb.String(), err

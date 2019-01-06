@@ -7,7 +7,21 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type ExtractFunc func(*sqlx.Rows) error
+type Rows interface {
+	Next() bool
+	NextResultSet() bool
+	Err() error
+
+	Scan(...interface{}) error
+	MapScan(map[string]interface{}) error
+	StructScan(interface{}) error
+	SliceScan() ([]interface{}, error)
+
+	ColumnTypes() ([]*sql.ColumnType, error)
+	Columns() ([]string, error)
+}
+
+type ExtractFunc func(Rows) error
 
 type Dbop struct {
 	Maker
