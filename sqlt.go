@@ -3,7 +3,6 @@ package sqlt
 import (
 	"context"
 	"database/sql"
-	"text/template"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -15,10 +14,16 @@ type Dbop struct {
 	*sqlx.DB
 }
 
-func New(db *sqlx.DB, pattern string) *Dbop {
+func Default(dbname, dbsource, pattern string) *Dbop {
+	dbx := sqlx.MustConnect(dbname, dbsource)
+	maker := NewSqlTemplate(pattern)
+	return New(dbx, maker)
+}
+
+func New(db *sqlx.DB, maker Maker) *Dbop {
 	return &Dbop{
 		DB:    db,
-		Maker: NewSqlTemplate(pattern, make(template.FuncMap)),
+		Maker: maker,
 	}
 }
 

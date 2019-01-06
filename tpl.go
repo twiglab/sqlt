@@ -1,23 +1,36 @@
 package sqlt
 
 import (
+	"log"
+	"os"
 	"strings"
 	"text/template"
 )
 
 type SqlTemplate struct {
 	*template.Template
+	Debug  bool
+	logger *log.Logger
 }
 
-func NewSqlTemplate(pattern string, funcMap template.FuncMap) *SqlTemplate {
-	tpl := template.New("sqlt-template").Funcs(funcMap)
+func NewSqlTemplate(pattern string) *SqlTemplate {
+	tpl := template.New("sqlt-template").Funcs(make(template.FuncMap))
 	tpl = template.Must(tpl.ParseGlob(pattern))
-	return &SqlTemplate{Template: tpl}
+	return &SqlTemplate{
+		Template: tpl,
+		Debug:    false,
+		logger:   log.New(os.Stdout, "sqlt-std-template-", log.LstdFlags|log.Llongfile),
+	}
 }
 
 func (t *SqlTemplate) MakeSql(id string, param interface{}) (string, error) {
 	sb := new(strings.Builder)
 	err := t.ExecuteTemplate(sb, id, param)
+
+	if t.Debug && err == nil {
+		t.logger.Println(sb)
+	}
+
 	return sb.String(), err
 }
 
