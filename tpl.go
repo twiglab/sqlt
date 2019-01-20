@@ -14,8 +14,11 @@ type SqlTemplate struct {
 }
 
 func NewSqlTemplate(pattern string) *SqlTemplate {
-	tpl := template.New("sqlt-template").Funcs(make(template.FuncMap))
-	tpl = template.Must(tpl.ParseGlob(pattern))
+	return NewSqlTemplateWithFuncs(pattern, make(template.FuncMap))
+}
+
+func NewSqlTemplateWithFuncs(pattern string, funcs template.FuncMap) *SqlTemplate {
+	tpl := template.Must(template.New("sqlt-template").Funcs(funcs).ParseGlob(pattern))
 	return &SqlTemplate{
 		Template: tpl,
 		Debug:    false,
