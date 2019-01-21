@@ -29,7 +29,7 @@ type sqltExecer interface {
 	Maker
 }
 
-func query(ctx context.Context, ext sqltExecer, id string, data interface{}, h ExtractFunc) error {
+func query(ctx context.Context, ext sqltExecer, id string, data interface{}, h RowsExtractor) error {
 	param := dummy(data)
 
 	sql := MustSql(ext, id, param)
@@ -43,7 +43,7 @@ func query(ctx context.Context, ext sqltExecer, id string, data interface{}, h E
 		return err
 	}
 	defer rows.Close()
-	return h(rows)
+	return h.Extract(rows)
 }
 
 func exec(ctx context.Context, ext sqltExecer, id string, data interface{}) (r sql.Result, e error) {
@@ -60,17 +60,17 @@ func exec(ctx context.Context, ext sqltExecer, id string, data interface{}) (r s
 }
 
 type TExecer interface {
-	TQuery(context.Context, string, interface{}, ExtractFunc) error
+	TQuery(context.Context, string, interface{}, RowsExtractor) error
 	TExec(context.Context, string, interface{}) (sql.Result, error)
-	TExecRtn(context.Context, string, interface{}, ExtractFunc) error
+	TExecRtn(context.Context, string, interface{}, RowsExtractor) error
 }
 
-func Query(execer TExecer, ctx context.Context, id string, param interface{}, h ExtractFunc) (err error) {
+func Query(execer TExecer, ctx context.Context, id string, param interface{}, h RowsExtractor) (err error) {
 	err = execer.TQuery(ctx, id, param, h)
 	return
 }
 
-func MustQuery(execer TExecer, ctx context.Context, id string, param interface{}, h ExtractFunc) {
+func MustQuery(execer TExecer, ctx context.Context, id string, param interface{}, h RowsExtractor) {
 	if err := Query(execer, ctx, id, param, h); err != nil {
 		panic(err)
 	}
@@ -89,12 +89,12 @@ func MustExec(execer TExecer, ctx context.Context, id string, param interface{})
 	return
 }
 
-func ExecRtn(execer TExecer, ctx context.Context, id string, param interface{}, h ExtractFunc) (err error) {
+func ExecRtn(execer TExecer, ctx context.Context, id string, param interface{}, h RowsExtractor) (err error) {
 	err = execer.TExecRtn(ctx, id, param, h)
 	return
 }
 
-func MustExecRtn(execer TExecer, ctx context.Context, id string, param interface{}, h ExtractFunc) {
+func MustExecRtn(execer TExecer, ctx context.Context, id string, param interface{}, h RowsExtractor) {
 	if err := ExecRtn(execer, ctx, id, param, h); err != nil {
 		panic(err)
 	}

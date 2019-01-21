@@ -23,6 +23,14 @@ type Rows interface {
 
 type ExtractFunc func(Rows) error
 
+func (e ExtractFunc) Extract(rs Rows) error {
+	return e(rs)
+}
+
+type RowsExtractor interface {
+	Extract(Rows) error
+}
+
 type Dbop struct {
 	Maker
 	*sqlx.DB
@@ -41,7 +49,7 @@ func New(db *sqlx.DB, maker Maker) *Dbop {
 	}
 }
 
-func (c *Dbop) TQuery(ctx context.Context, id string, param interface{}, h ExtractFunc) error {
+func (c *Dbop) TQuery(ctx context.Context, id string, param interface{}, h RowsExtractor) error {
 	return query(ctx, c, id, param, h)
 }
 
@@ -50,7 +58,7 @@ func (c *Dbop) TExec(ctx context.Context, id string, param interface{}) (r sql.R
 	return
 }
 
-func (c *Dbop) TExecRtn(ctx context.Context, id string, param interface{}, h ExtractFunc) error {
+func (c *Dbop) TExecRtn(ctx context.Context, id string, param interface{}, h RowsExtractor) error {
 	return query(ctx, c, id, param, h)
 }
 
@@ -71,7 +79,7 @@ type Txop struct {
 	*sqlx.Tx
 }
 
-func (t *Txop) TQuery(ctx context.Context, id string, param interface{}, h ExtractFunc) error {
+func (t *Txop) TQuery(ctx context.Context, id string, param interface{}, h RowsExtractor) error {
 	return query(ctx, t, id, param, h)
 }
 
@@ -80,7 +88,7 @@ func (t *Txop) TExec(ctx context.Context, id string, param interface{}) (r sql.R
 	return
 }
 
-func (t *Txop) TExecRtn(ctx context.Context, id string, param interface{}, h ExtractFunc) error {
+func (t *Txop) TExecRtn(ctx context.Context, id string, param interface{}, h RowsExtractor) error {
 	return query(ctx, t, id, param, h)
 }
 
