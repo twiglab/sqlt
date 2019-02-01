@@ -37,6 +37,10 @@ func (t *SqlTemplate) MakeSql(id string, param interface{}) (string, error) {
 	return sb.String(), err
 }
 
+func (t *SqlTemplate) SetDebug(b bool) {
+	t.Debug = b
+}
+
 type Maker interface {
 	MakeSql(string, interface{}) (string, error)
 }

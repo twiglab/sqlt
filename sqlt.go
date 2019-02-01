@@ -15,7 +15,6 @@ type Rows interface {
 	Scan(...interface{}) error
 	MapScan(map[string]interface{}) error
 	StructScan(interface{}) error
-	SliceScan() ([]interface{}, error)
 
 	ColumnTypes() ([]*sql.ColumnType, error)
 	Columns() ([]string, error)

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/twiglab/sqlt/internal/mapper"
 )
 
 var DefaultTxOptions *sql.TxOptions = NewTxOptions(sql.LevelDefault, false)
@@ -43,7 +44,7 @@ func query(ctx context.Context, ext sqltExecer, id string, data interface{}, h R
 		return err
 	}
 	defer rows.Close()
-	return h.Extract(rows)
+	return h.Extract(&Rs{Rows: rows})
 }
 
 func exec(ctx context.Context, ext sqltExecer, id string, data interface{}) (r sql.Result, e error) {
@@ -119,4 +120,16 @@ func Commit(t TxEnd) error {
 
 func Rollback(t TxEnd) error {
 	return t.TRollback()
+}
+
+type Rs struct {
+	*sqlx.Rows
+}
+
+func (r *Rs) MapScan(m map[string]interface{}) error {
+	return mapper.MapScan(r, m)
+}
+
+func (r *Rs) StructScan(dist interface{}) error {
+	return mapper.StructScan(r, dist)
 }
