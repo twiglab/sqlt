@@ -23,7 +23,6 @@ var (
 
 const (
 	packageVersion = "0.6"
-	mapperTagKey   = "mapper"
 	jsonTagKey     = "json"
 	sqltTagKey     = "sqlt"
 	sqlxTagKey     = "db"   // for sqlx
@@ -460,13 +459,12 @@ func isTimeField(fieldValue reflect.Value) bool {
 
 func getStructTag(field reflect.StructField) string {
 	tagValue := ""
-	//1.check mapperTagKey
-	tagValue = field.Tag.Get(mapperTagKey)
+
+	tagValue = field.Tag.Get(sqltTagKey)
 	if checkTagValidity(tagValue) {
 		return tagValue
 	}
 
-	//2.check jsonTagKey
 	tagValue = field.Tag.Get(jsonTagKey)
 	if checkTagValidity(tagValue) {
 		// support more tag property, as json tag omitempty 2018-07-13
