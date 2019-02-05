@@ -1,0 +1,5 @@
+{
+		"data_base_name" :"postgres",
+		"data_source_name" :"dbname=testdb sslmode=disable",
+		"table_name": "req_order"
+}
