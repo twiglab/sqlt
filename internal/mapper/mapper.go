@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-	"strings"
 	"sync"
 	"time"
 )
@@ -25,8 +24,7 @@ const (
 	packageVersion = "0.6"
 	jsonTagKey     = "json"
 	sqltTagKey     = "sqlt"
-	sqlxTagKey     = "db"   // for sqlx
-	xormTagKey     = "xorm" // for xorm
+	sqlxTagKey     = "db" // for sqlx
 	IgnoreTagValue = "-"
 	nameConnector  = "_"
 	formatTime     = "15:04:05"
@@ -460,15 +458,14 @@ func isTimeField(fieldValue reflect.Value) bool {
 func getStructTag(field reflect.StructField) string {
 	tagValue := ""
 
-	tagValue = field.Tag.Get(sqltTagKey)
+	tagValue = field.Tag.Get(sqlxTagKey)
 	if checkTagValidity(tagValue) {
 		return tagValue
 	}
 
-	tagValue = field.Tag.Get(jsonTagKey)
+	tagValue = field.Tag.Get(sqltTagKey)
 	if checkTagValidity(tagValue) {
-		// support more tag property, as json tag omitempty 2018-07-13
-		return strings.Split(tagValue, ",")[0]
+		return tagValue
 	}
 
 	return ""
