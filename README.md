@@ -105,4 +105,18 @@ staff.StaffId = 67890
 h := new(StaffHandler)
 sqlt.MustQuery(dbop, context.Background(), "Staff.select", staff, h)
 ```
-
+staff 最为查询条件传入模板，模板会根据staff字段构建查询条件，然后通过sqlx执行查询，返回结果由RowsExtractor的实现StaffHandler处理
+模板：
+```template
+{{ define "Staff.select"}}
+select
+	staff_id,
+	staff_name,
+	created_at
+from
+	Staff
+where
+	{{if .StaffId}} staff_id = :staff_id {{end}}
+	{{if .StaffName}}and  staff_name = :staff_name {{end}}
+{{end}}
+```
