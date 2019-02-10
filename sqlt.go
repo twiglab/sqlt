@@ -36,7 +36,7 @@ type Dbop struct {
 }
 
 func Default(dbname, dbsource, pattern string) *Dbop {
-	dbx := sqlx.MustConnect(dbname, dbsource)
+	dbx := MustConnect(dbname, dbsource)
 	maker := NewSqlTemplate(pattern)
 	return New(dbx, maker)
 }
