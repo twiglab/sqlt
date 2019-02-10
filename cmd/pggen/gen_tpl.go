@@ -13,7 +13,7 @@ func genSelect(t *Table) {
 
 	fmt.Printf("from\n\t%s\nwhere\n", t.SnakeName())
 	for _, f := range t.Fields {
-		fmt.Printf("\t{{if .%s}} %s = :%s and {{end}}\n", f.SnakeName(), f.Name, f.SnakeName())
+		fmt.Printf("\t{{if .%s}}and %s = :%s{{end}}\n", f.SnakeName(), f.Name, f.Name)
 	}
 
 	fmt.Printf("{{end}}\n")
@@ -37,11 +37,11 @@ func genUpdate(t *Table) {
 	fmt.Printf("{{ define \"%s.update\"}}\n", t.SnakeName())
 	fmt.Printf("update\n\t%s\nset\n", t.SnakeName())
 	for _, f := range t.Fields {
-		fmt.Printf("\t{{if .%s}} %s = :%s, {{end}}\n", f.SnakeName(), f.Name, f.SnakeName())
+		fmt.Printf("\t{{if .%s}} ,%s = :%s {{end}}\n", f.SnakeName(), f.Name, f.Name)
 	}
-	fmt.Printf("nwhere\n", t.SnakeName())
+	fmt.Printf("\nwhere\n")
 	for _, f := range t.Fields {
-		fmt.Printf("\t{{if .%s}} %s = :%s and {{end}}\n", f.SnakeName(), f.Name, f.SnakeName())
+		fmt.Printf("\t{{if .%s}} %s = :%s and {{end}}\n", f.SnakeName(), f.Name, f.Name)
 	}
 
 	fmt.Printf("{{end}}\n")

@@ -1,0 +1,64 @@
+const TableName = "Staff"
+
+const (
+StaffId = "staff_id"
+StaffName = "staff_name"
+CreatedAt = "created_at"
+UpdatedAt = "updated_at"
+Age = "age"
+)
+type Staff struct {
+StaffId int `db:"staff_id"` // 
+StaffName string `db:"staff_name"` // 
+CreatedAt time.Time `db:"created_at"` // 
+UpdatedAt time.Time `db:"updated_at"` // 
+Age int `db:"age"` // 
+}
+{{ define "Staff.insert"}}
+insert into Staff (
+	{{if .StaffId}} ,staff_id {{end}}
+	{{if .StaffName}} ,staff_name {{end}}
+	{{if .CreatedAt}} ,created_at {{end}}
+	{{if .UpdatedAt}} ,updated_at {{end}}
+	{{if .Age}} ,age {{end}}
+) values (
+	{{if .StaffId}} ,:staff_id {{end}}
+	{{if .StaffName}} ,:staff_name {{end}}
+	{{if .CreatedAt}} ,:created_at {{end}}
+	{{if .UpdatedAt}} ,:updated_at {{end}}
+	{{if .Age}} ,:age {{end}}
+)
+{{end}}
+{{ define "Staff.select"}}
+select
+	staff_id,
+	staff_name,
+	created_at,
+	updated_at,
+	age,
+from
+	Staff
+where
+	{{if .StaffId}}and staff_id = :staff_id{{end}}
+	{{if .StaffName}}and staff_name = :staff_name{{end}}
+	{{if .CreatedAt}}and created_at = :created_at{{end}}
+	{{if .UpdatedAt}}and updated_at = :updated_at{{end}}
+	{{if .Age}}and age = :age{{end}}
+{{end}}
+{{ define "Staff.update"}}
+update
+	Staff
+set
+	{{if .StaffId}} ,staff_id = :staff_id {{end}}
+	{{if .StaffName}} ,staff_name = :staff_name {{end}}
+	{{if .CreatedAt}} ,created_at = :created_at {{end}}
+	{{if .UpdatedAt}} ,updated_at = :updated_at {{end}}
+	{{if .Age}} ,age = :age {{end}}
+
+where
+	{{if .StaffId}} staff_id = :staff_id and {{end}}
+	{{if .StaffName}} staff_name = :staff_name and {{end}}
+	{{if .CreatedAt}} created_at = :created_at and {{end}}
+	{{if .UpdatedAt}} updated_at = :updated_at and {{end}}
+	{{if .Age}} age = :age and {{end}}
+{{end}}

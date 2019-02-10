@@ -11,8 +11,6 @@ import (
 
 var db *sqlx.DB
 
-const tableName = "req_order"
-
 type Origin struct {
 	DataBaseName   string `json:"data_base_name"`
 	DataSourceName string `json:"data_source_name"`
@@ -51,7 +49,7 @@ func main() {
 	}
 
 	table := new(Table)
-	table.TableName = tableName
+	table.TableName = origin.TableName
 
 	for r.Next() {
 		f := new(Field)
