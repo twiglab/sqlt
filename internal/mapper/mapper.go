@@ -120,18 +120,12 @@ func CheckExistsField(elem reflect.Value, fieldName string) (realFieldName strin
 
 }
 
-// GetFieldName get fieldName with ElemValue and index
-// if config tag string, return tag value
-func GetFieldName(objElem reflect.Value, index int) string {
-	fieldName := ""
+func GetFieldName(objElem reflect.Value, index int) (fieldName string) {
 	field := objElem.Type().Field(index)
-	tag := getStructTag(field)
-	if tag != "" {
-		fieldName = tag
-	} else {
+	if fieldName = getStructTag(field); fieldName == "" {
 		fieldName = field.Name
 	}
-	return fieldName
+	return
 }
 
 // MapperMap mapper and set value from map to object

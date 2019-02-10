@@ -27,7 +27,7 @@ func genInsert(t *Table) {
 	}
 	fmt.Printf(") values (\n")
 	for _, f := range t.Fields {
-		fmt.Printf("\t{{if .%s}} ,:%s {{end}}\n", f.SnakeName(), f.SnakeName())
+		fmt.Printf("\t{{if .%s}} ,:%s {{end}}\n", f.SnakeName(), f.Name)
 	}
 	fmt.Printf(")\n")
 	fmt.Printf("{{end}}\n")
