@@ -14,7 +14,7 @@ sqlt 也支持 go mod
 
 sqlt 深度依赖sqlx， 是在sqlx的基础上增加了模板功能，底层的数据库方法全部通过sqlx的NamedStmt和PrepareName完成对数据库的访问。
 
-sqlt 对外提供的所有操作全部通过 `Dbop` struct 提供，Dbop struct 组合了sqlx.DB和模板（由Maker）
+sqlt 对外提供的所有操作全部通过 `Dbop` struct 提供，Dbop struct 组合了sqlx.DB和模板（由Maker接口定义）
 
 ```go
 type Dbop struct {
@@ -32,4 +32,12 @@ type Maker interface {
 	MakeSql(string, interface{}) (string, error)
 }
 ```
+（*golang 自带的模板未必最好，欢迎pr更好模板实现*）
 
+## 使用说明
+
+### Dbop的创建
+最简单的创建方式为：
+```go
+dbop := sqlt.Default("postgres", "dbname=testdb sslmode=disable", "tpl/*.tpl")
+```
