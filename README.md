@@ -71,8 +71,38 @@ dbop := sqlt.New(dbx, tpl)
 
 以及对应的Must版本
 
-Texcer 为 `*Dbop`，所有的方法都支持`context.Context`，id 为模板的id，param为传递给模板和用于Prepare的参数
+Texcer 为 `*Dbop`，所有的方法都支持`context.Context`，id 为模板的id，param为传递给模板和用于Prepare的参数（用于构建条件，和sql拼接）
 
 Exec方法对应执行无返回的sql语句，如：insert， update， delete和存储过程。
 
 Query方法用于执行带有返回结果的sql语句，如：select，和带有returnning子句的insert， update （*returnning子句需要数据库和驱动的支持*）
+
+#### Query 的结果集处理
+
+sqlt 提供了 `RowsExtractor` 接口处理结果集，Query的最后一个参数中传入RowsExtractor的实现。
+
+例子：
+```go
+type StaffHandler struct {
+	Staffs []*Staff
+}
+
+func (sh *StaffHandler) Extract(rs sqlt.Rows) (err error) {
+	for rs.Next() {
+		staff := new(Staff)
+		if err = rs.StructScan(staff); err != nil {
+			return
+		}
+
+		sh.Staffs = append(sh.Staffs, staff)
+	}
+
+	return rs.Err()
+}
+
+staff := new(Staff)
+staff.StaffId = 67890
+h := new(StaffHandler)
+sqlt.MustQuery(dbop, context.Background(), "Staff.select", staff, h)
+```
+
