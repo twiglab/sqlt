@@ -38,6 +38,20 @@ type Maker interface {
 
 ### Dbop的创建
 最简单的创建方式为：
+
 ```go
 dbop := sqlt.Default("postgres", "dbname=testdb sslmode=disable", "tpl/*.tpl")
 ```
+**注意：不要忘记引入数据库驱动**
+
+如果你有现成的数据库链接，或者对模板有特殊的要求，有可以用使用`sqlt.New`方法创建
+
+```go
+dbx := sqlt.MustConnect("postgres", "dbname=testdb sslmode=disable")
+tpl := sqlt.NewSqlTemplate("tpl/*.tpl")
+tpl.SetDebug(true)
+
+dbop := sqlt.New(dbx, tpl)
+```
+
+如果你的模板方法中用到了自定义的函数，sqlt也提供了一个 `NewSqlTemplateWithFuncs` 的方法用于创建在自定义函数的模板 （`tpl.go`）
