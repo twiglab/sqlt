@@ -54,4 +54,21 @@ tpl.SetDebug(true)
 dbop := sqlt.New(dbx, tpl)
 ```
 
-如果你的模板方法中用到了自定义的函数，sqlt也提供了一个 `NewSqlTemplateWithFuncs` 的方法用于创建在自定义函数的模板 （`tpl.go`）
+如果你的模板方法中用到了自定义的函数，sqlt也提供了一个 `NewSqlTemplateWithFuncs` 的方法用于创建带有自定义函数的模板 （位于`tpl.go`中）
+
+### 模板
+
+再次说明sqlt默认自带的模板是text/template的封装实现，详细的用法请参考text/template
+
+(*example目录中有完整的例子*)
+
+### sqlt的方法
+
+最新版本中，所有的sqlt的方法都可以直接调用，分别为：
+- func Query(execer TExecer, ctx context.Context, id string, param interface{}, h RowsExtractor) (err error) 
+- func Exec(execer TExecer, ctx context.Context, id string, param interface{}) (r sql.Result, err error) 
+- func ExecRtn(execer TExecer, ctx context.Context, id string, param interface{}, h RowsExtractor) (err error) 
+
+以及对应的Must版本
+
+Texcer 为 `*Dbop`，所有的方法都支持`context.Context`，id 为模板的id，param为传递给模板和用于Prepare的参数
