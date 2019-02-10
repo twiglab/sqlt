@@ -65,10 +65,14 @@ dbop := sqlt.New(dbx, tpl)
 ### sqlt的方法
 
 最新版本中，所有的sqlt的方法都可以直接调用，分别为：
+
 - func Query(execer TExecer, ctx context.Context, id string, param interface{}, h RowsExtractor) (err error) 
 - func Exec(execer TExecer, ctx context.Context, id string, param interface{}) (r sql.Result, err error) 
-- func ExecRtn(execer TExecer, ctx context.Context, id string, param interface{}, h RowsExtractor) (err error) 
 
 以及对应的Must版本
 
 Texcer 为 `*Dbop`，所有的方法都支持`context.Context`，id 为模板的id，param为传递给模板和用于Prepare的参数
+
+Exec方法对应执行无返回的sql语句，如：insert， update， delete和存储过程。
+
+Query方法用于执行带有返回结果的sql语句，如：select，和带有returnning子句的insert， update （*returnning子句需要数据库和驱动的支持*）

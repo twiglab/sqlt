@@ -90,17 +90,6 @@ func MustExec(execer TExecer, ctx context.Context, id string, param interface{})
 	return
 }
 
-func ExecRtn(execer TExecer, ctx context.Context, id string, param interface{}, h RowsExtractor) (err error) {
-	err = execer.TExecRtn(ctx, id, param, h)
-	return
-}
-
-func MustExecRtn(execer TExecer, ctx context.Context, id string, param interface{}, h RowsExtractor) {
-	if err := ExecRtn(execer, ctx, id, param, h); err != nil {
-		panic(err)
-	}
-}
-
 type TxBegin interface {
 	TBegin(context.Context, *sql.TxOptions) (*Txop, error)
 }
