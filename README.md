@@ -113,6 +113,10 @@ staff.StaffId = 67890
 h := new(StaffHandler)
 sqlt.MustQuery(dbop, context.Background(), "Staff.select", staff, h)
 ```
+
+**sqlt *不要求*返回字段和struct字段一一对应，struct映射是按照row和struct公共部分映射的**
+
+
 staff 最为查询条件传入模板，模板会根据staff字段构建查询条件，然后通过sqlx执行查询，返回结果由RowsExtractor的实现StaffHandler处理
 模板：
 ```template
@@ -141,3 +145,25 @@ cmd目录下的pggen是postgresql数据库的代码生成器，目前sqlt只提�
 **生成器生成的是代码片段，并不是可以直接使用的结果**
 
 开发人员需要从生成结果中复制有用的片段到程序中
+
+## 一些规则
+
+这些规则不是强制的，但是如果不遵循这些规则，使用sqlt的工作量会增大，从而失去价值
+
+- 数据库对象（表，字段）的命名，采用下划线格式（_) 如： staff_name, staff_id
+- struct 中的命名采用golang推荐的snake风格，如：StaffName, StaffId
+- 每个表里面最好都加上 created_at和updated_at这2个字段，用于记录创建时间和修改时间（后面生成模板的时候会简单一些）
+- 模板里面，逗号，and 都放在字段前面
+- 模板的名称要能顾名思义
+
+第一条和第二天规则方便生成和struct和row直接的映射
+第三条和第四条方便模板的编写，确保不会生成没有字段的错误sql
+
+## sqlt已知的一些问题和避免方法
+
+较之 Mybatis，由于golang和模板的限制，sqlt存在下列问题
+- text/template是没有上下文的， 所以无法帮助你处理结尾逗号(,)问题，避免的方法参见规则3,4
+- 0值问题，golang默认0值，对于0值模板会排除，需要用自定义函数去处理
+
+## 版权
+MIT
