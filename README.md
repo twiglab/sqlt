@@ -83,6 +83,14 @@ sqlt 提供了 `RowsExtractor` 接口处理结果集，Query的最后一个参�
 
 例子：
 ```go
+type Staff struct {
+	StaffId   int       `db:"staff_id"`   //
+	StaffName string    `db:"staff_name"` //
+	CreatedAt time.Time `db:"created_at"` //
+	UpdatedAt time.Time `db:"updated_at"` //
+	Age       int       `db:"age"`        //
+}
+
 type StaffHandler struct {
 	Staffs []*Staff
 }
@@ -120,3 +128,10 @@ where
 	{{if .StaffName}}and  staff_name = :staff_name {{end}}
 {{end}}
 ```
+
+## Gen （代码生成器）
+
+cmd目录下的pggen是postgresql数据库的代码生成器，目前sqlt只提供了pg代码生成
+
+首先需要说明的是：
+- 生成器以表为单位生成对应的struct，常量，和增删改查通用的模板
