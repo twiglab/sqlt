@@ -2,6 +2,8 @@
 
 java的数据库访问工具MyBatis给大家留下了深刻的印象，早在几年前，我刚刚接触golang的时候，也希望golang也有类似的工具，对golang稍微熟悉后，发现golang自带模板功能（text/template），于是在另外一个开源库sqlx的基础上，增加模板拼接sql的功能，所以 sqlt 就诞生了。
 
+最早sqlt是托管在oschina，后续迁移到github.com/it512/sqlt，之后加入twiglab
+
 ## 安装
 
 ```
